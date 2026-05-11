@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+          --bg:#0a0e17;--bg2:#0f1523;--bg3:#141c2e;--card:#111827;
+          --border:#1e2d45;--border2:#243352;
+          --cyan:#00e5c8;--cyan2:#00b8a0;--blue:#4f8ef7;--purple:#a855f7;
+          --yellow:#eab308;--orange:#f97316;
+          --text:#e8edf5;--muted:#5a6a84;--muted2:#7a8ba8;
+          --success:#22c55e;--danger:#ef4444;--warn:#f59e0b;
+          --r:10px;--r2:14px;--r3:20px;
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+        /* PAGES */
+        .page{display:none;min-height:100vh}.page.active{display:block}
+
+        /* ══ AUTH ══ */
+        #page-auth{display:none;min-height:100vh;background:linear-gradient(135deg,#070b13,#0a1020,#070b13);position:relative;overflow:hidden;align-items:center;justify-content:center}
+        #page-auth.active{display:flex}
+        .auth-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:.25}
+        .auth-glow{position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(0,229,200,.07) 0%,transparent 65%);pointer-events:none}
+        .auth-box{position:relative;z-index:2;width:100%;max-width:420px;margin:1.5rem;background:rgba(17,24,39,.92);border:1px solid var(--border2);border-radius:var(--r3);padding:2.5rem 2.8rem;backdrop-filter:blur(20px);box-shadow:0 0 80px rgba(0,229,200,.04),0 40px 80px rgba(0,0,0,.5)}
+        .auth-logo{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--cyan);margin-bottom:2rem;display:flex;align-items:center;gap:.5rem}
+        .auth-logo span{color:var(--text);font-weight:400}
+        .auth-tabs{display:flex;margin-bottom:2rem;background:var(--bg2);border-radius:var(--r);padding:4px;border:1px solid var(--border)}
+        .auth-tab{flex:1;padding:.55rem;border:none;background:none;cursor:pointer;border-radius:8px;font-size:.88rem;font-weight:500;font-family:'Outfit',sans-serif;color:var(--muted2);transition:all .2s}
+        .auth-tab.active{background:var(--bg3);color:var(--cyan);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+        .fg{margin-bottom:1.1rem}
+        .fg label{display:block;font-size:.78rem;font-weight:600;color:var(--muted2);margin-bottom:.4rem;letter-spacing:.06em;text-transform:uppercase}
+        .fg input,.fg select,.fg textarea{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Outfit',sans-serif;font-size:.92rem;padding:.72rem 1rem;outline:none;transition:border-color .2s,box-shadow .2s}
+        .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,200,.08)}
+        .fg select option{background:var(--bg2)}
+        .fg textarea{resize:vertical;min-height:90px}
+        .btn-cyan{width:100%;padding:.85rem;background:var(--cyan);color:#0a0e17;border:none;cursor:pointer;border-radius:var(--r);font-size:.95rem;font-weight:700;font-family:'Outfit',sans-serif;transition:background .2s,transform .15s;box-shadow:0 4px 20px rgba(0,229,200,.25)}
+        .btn-cyan:hover{background:var(--cyan2);transform:translateY(-1px)}
+        .auth-msg{font-size:.83rem;text-align:center;margin-top:.8rem;min-height:1.2rem}
+        .auth-msg.err{color:var(--danger)}.auth-msg.ok{color:var(--success)}
+
+        /* ══ NAV ══ */
+        .topnav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:58px;background:rgba(10,14,23,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+        .nav-logo{font-family:'Space Mono',monospace;font-size:1rem;color:var(--cyan);font-weight:700;cursor:pointer;user-select:none}
+        .nav-center{display:flex;gap:.2rem}
+        .nav-btn{background:none;border:none;cursor:pointer;padding:.4rem .85rem;border-radius:var(--r);color:var(--muted2);font-size:.85rem;font-family:'Outfit',sans-serif;font-weight:500;transition:all .2s}
+        .nav-btn:hover{color:var(--text);background:var(--bg3)}
+        .nav-btn.active{color:var(--cyan)}
+        .nav-right{display:flex;align-items:center;gap:.75rem}
+        .nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--blue));display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#0a0e17;cursor:pointer;border:2px solid rgba(0,229,200,.3)}
+        .nav-signout{background:none;border:1px solid var(--border2);cursor:pointer;padding:.35rem .8rem;border-radius:var(--r);color:var(--muted2);font-size:.8rem;font-family:'Outfit',sans-serif;transition:all .2s}
+        .nav-signout:hover{color:var(--danger);border-color:var(--danger)}
+
+        /* ══ COURSES PAGE ══ */
+        #page-courses{padding-top:58px}
+        .wrap{max-width:1100px;margin:0 auto;padding:3rem 1.5rem}
+        .page-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(0,229,200,.08);border:1px solid rgba(0,229,200,.2);color:var(--cyan);font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .8rem;border-radius:100px;margin-bottom:1rem}
+        .wrap h1{font-size:2.2rem;font-weight:800;margin-bottom:.5rem}
+        .wrap .sub{color:var(--muted2);font-size:1rem;margin-bottom:2.5rem}
+        .courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
+        .course-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.5rem;cursor:pointer;transition:border-color .25s,transform .2s,box-shadow .25s;position:relative;overflow:hidden}
+        .course-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--blue));transform:scaleX(0);transform-origin:left;transition:transform .3s}
+        .course-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+        .course-card:hover::before{transform:scaleX(1)}
+        .cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem}
+        .cc-icon{width:44px;height:44px;border-radius:10px;background:rgba(0,229,200,.1);border:1px solid rgba(0,229,200,.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+        .cc-badge{font-size:.7rem;font-weight:700;padding:.25rem .65rem;border-radius:100px;border:1px solid;text-transform:uppercase;letter-spacing:.08em}
+        .badge-ongoing{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,200,.08)}
+        .badge-new{border-color:var(--blue);color:var(--blue);background:rgba(79,142,247,.08)}
+        .cc-title{font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
+        .cc-desc{font-size:.85rem;color:var(--muted2);line-height:1.6;margin-bottom:1rem}
+        .cc-features{list-style:none;margin-bottom:1.25rem}
+        .cc-features li{font-size:.83rem;color:var(--muted2);padding:.2rem 0;display:flex;align-items:center;gap:.5rem}
+        .cc-features li::before{content:'•';color:var(--cyan)}
+        .cc-btn{width:100%;padding:.7rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:.88rem;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+        .course-card:hover .cc-btn{background:var(--cyan);color:#0a0e17;border-color:var(--cyan)}
+        .add-course-card{background:var(--bg2);border:2px dashed var(--border2);border-radius:var(--r2);padding:1.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;gap:1rem;transition:border-color .25s,background .25s;color:var(--muted);text-align:center}
+        .add-course-card:hover{border-color:var(--cyan);background:rgba(0,229,200,.03);color:var(--cyan)}
+
+        /* ══ DASHBOARD ══ */
+        #page-dashboard{padding-top:58px}
+        .dash-wrap{max-width:1400px;margin:0 auto;padding:2rem 1.5rem}
+        .dash-hero{margin-bottom:2rem}
+        .dtrack{display:inline-flex;align-items:center;gap:.4rem;background:rgba(0,229,200,.08);border:1px solid rgba(0,229,200,.25);color:var(--cyan);font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.28rem .75rem;border-radius:100px;margin-bottom:.75rem}
+        .dash-hero h1{font-size:2.4rem;font-weight:800;margin-bottom:.4rem}
+        .dash-hero p{color:var(--muted2);font-size:.95rem;max-width:600px;line-height:1.6}
+        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+        .stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.25rem 1.5rem;text-align:center}
+        .stat-box .val{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--cyan);line-height:1}
+        .stat-box .lbl{font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.4rem}
+        .progress-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+        .prog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+        .prog-label{font-size:.8rem;color:var(--muted);margin-bottom:.8rem}
+        .prog-bar-wrap{background:var(--bg2);border-radius:100px;height:8px;overflow:hidden;border:1px solid var(--border)}
+        .prog-bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+        .filters-row{display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;flex-wrap:wrap}
+        .search-box{flex:1;min-width:200px;max-width:320px;display:flex;align-items:center;gap:.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:.55rem .9rem}
+        .search-box input{background:none;border:none;outline:none;color:var(--text);font-size:.88rem;font-family:'Outfit',sans-serif;width:100%}
+        .search-box input::placeholder{color:var(--muted)}
+        .chip{padding:.4rem .9rem;border-radius:100px;font-size:.78rem;font-weight:600;border:1px solid var(--border2);background:var(--bg2);color:var(--muted2);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+        .chip:hover{border-color:var(--cyan);color:var(--cyan)}
+        .chip.active{background:var(--cyan);color:#0a0e17;border-color:var(--cyan)}
+        .playlist-btn{margin-left:auto;display:flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;background:var(--text);color:var(--bg);border:none;border-radius:var(--r);font-size:.83rem;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:opacity .2s}
+        .playlist-btn:hover{opacity:.88}
+        .topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem}
+
+        /* TOPIC CARD */
+        .topic-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:border-color .25s,box-shadow .25s}
+        .topic-card:hover{border-color:var(--border2);box-shadow:0 8px 30px rgba(0,0,0,.25)}
+        .tc-top{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+        .tc-num{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,rgba(0,229,200,.2),rgba(79,142,247,.2));border:1px solid rgba(0,229,200,.25);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;color:var(--cyan);flex-shrink:0}
+        .tc-title{font-size:1rem;font-weight:700;flex:1}
+        .tc-phase{font-size:.68rem;font-weight:700;padding:.2rem .5rem;border-radius:6px;background:rgba(168,85,247,.1);color:var(--purple);border:1px solid rgba(168,85,247,.2);letter-spacing:.06em}
+        .tc-body{padding:1rem 1.25rem}
+        .sec-label{font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+        .concept-item{font-size:.83rem;color:var(--muted2);padding:.18rem 0;display:flex;align-items:center;gap:.4rem}
+        .concept-item::before{content:'›';color:var(--cyan);font-weight:700}
+        .lec-btn{display:inline-flex;align-items:center;gap:.4rem;margin:.75rem 0;padding:.35rem .8rem;background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.25);border-radius:var(--r);color:var(--blue);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;text-decoration:none}
+        .lec-btn:hover{background:rgba(79,142,247,.2);border-color:var(--blue)}
+
+        /* PROBLEM ITEM */
+        .prob-item{display:flex;align-items:center;gap:.5rem;padding:.45rem .6rem;border-radius:var(--r);border:1px solid var(--border);margin-bottom:.35rem;background:var(--bg2);position:relative;transition:border-color .2s,background .2s}
+        .prob-item:hover{border-color:var(--border2);background:var(--bg3)}
+        .prob-solved-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--success);opacity:0;transition:opacity .2s}
+        .prob-item.solved .prob-solved-bar{opacity:1}
+        .prob-item.solved{border-color:rgba(34,197,94,.2)}
+        .prob-lc{background:rgba(79,142,247,.15);color:var(--blue);font-size:.68rem;font-weight:700;padding:.18rem .45rem;border-radius:5px;font-family:'Space Mono',monospace;white-space:nowrap;flex-shrink:0}
+        .prob-name{font-size:.83rem;font-weight:500;flex:1;cursor:pointer}
+        .prob-name:hover{color:var(--cyan);text-decoration:underline}
+        .prob-diff{font-size:.68rem;font-weight:700;padding:.15rem .45rem;border-radius:100px;flex-shrink:0}
+        .diff-easy{background:rgba(34,197,94,.1);color:var(--success)}
+        .diff-med{background:rgba(245,158,11,.1);color:var(--warn)}
+        .diff-hard{background:rgba(239,68,68,.1);color:var(--danger)}
+
+        /* ACTION BUTTONS on problem */
+        .prob-actions{display:flex;align-items:center;gap:.25rem;flex-shrink:0}
+        .prob-icon-btn{background:none;border:none;cursor:pointer;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.82rem;color:var(--muted);transition:all .2s;flex-shrink:0}
+        .prob-icon-btn:hover{background:var(--bg);color:var(--text)}
+        .prob-icon-btn.note-btn:hover{color:var(--yellow)}
+        .prob-icon-btn.note-btn.has-note{color:var(--yellow)}
+        .prob-icon-btn.rev-btn{color:var(--muted)}
+        .prob-icon-btn.rev-btn:hover{color:var(--cyan);background:rgba(0,229,200,.1)}
+        .prob-icon-btn.rev-btn.has-rev{color:var(--cyan)}
+        .prob-icon-btn.lc-btn-small:hover{color:var(--orange);background:rgba(249,115,22,.1)}
+
+        .tc-bottom{padding:.75rem 1.25rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:.4rem;background:var(--bg2)}
+        .cb-row{display:flex;gap:1.2rem;flex-wrap:wrap}
+        .cb-item{display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.8rem;color:var(--muted2)}
+        .cb-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--cyan);cursor:pointer}
+        .add-topic-card{background:var(--bg2);border:2px dashed var(--border2);border-radius:var(--r2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:.75rem;color:var(--muted);text-align:center;transition:border-color .25s,color .25s;padding:1.5rem}
+        .add-topic-card:hover{border-color:var(--cyan);color:var(--cyan)}
+
+        /* ══ REVISION DASHBOARD PAGE ══ */
+        #page-revdash{padding-top:58px;display:none;min-height:100vh}
+        #page-revdash.active{display:block}
+        .revdash-wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+
+        /* Back button */
+        .back-btn{display:inline-flex;align-items:center;gap:.5rem;background:none;border:1px solid var(--border2);cursor:pointer;padding:.45rem .9rem;border-radius:var(--r);color:var(--muted2);font-size:.85rem;font-family:'Outfit',sans-serif;transition:all .2s;margin-bottom:1.5rem}
+        .back-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+
+        /* Problem hero card */
+        .prob-hero{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.75rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+        .prob-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--purple))}
+        .prob-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+        .prob-hero-left h2{font-size:1.5rem;font-weight:800;margin-bottom:.4rem}
+        .prob-hero-left .meta{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+        .prob-hero-right{display:flex;gap:.5rem;flex-shrink:0}
+        .btn-lc{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);border-radius:var(--r);color:var(--orange);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;text-decoration:none}
+        .btn-lc:hover{background:rgba(249,115,22,.2)}
+        .btn-solved{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:var(--r);color:var(--success);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+        .btn-solved:hover{background:rgba(34,197,94,.2)}
+        .btn-solved.is-solved{background:rgba(34,197,94,.2)}
+
+        /* Revision intervals grid */
+        .rev-intervals-title{font-size:1rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+        .intervals-master{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin-bottom:1.5rem}
+        .interval-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s}
+        .interval-card.done-card{border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.03)}
+        .interval-card.due-today{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04)}
+        .interval-card.upcoming{border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.03)}
+        .interval-card.future{border-color:var(--border);opacity:.55}
+        .int-left .int-day{font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--cyan);margin-bottom:.15rem}
+        .int-left .int-date{font-size:.75rem;color:var(--muted2)}
+        .int-left .int-label{font-size:.68rem;font-weight:600;margin-top:.2rem;text-transform:uppercase;letter-spacing:.08em}
+        .int-label.done-lbl{color:var(--success)}
+        .int-label.today-lbl{color:var(--danger)}
+        .int-label.soon-lbl{color:var(--warn)}
+        .int-label.future-lbl{color:var(--muted)}
+        .int-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:all .2s;flex-shrink:0;background:none}
+        .int-check:hover{border-color:var(--cyan)}
+        .int-check.checked{border-color:var(--success);background:rgba(34,197,94,.15);color:var(--success)}
+        .int-check.due{border-color:var(--danger);animation:pulse-red 2s infinite}
+        @keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+
+        /* Notes section */
+        .notes-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.5rem;margin-bottom:1.5rem}
+        .notes-section h3{font-size:1rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+        .notes-area{width:100%;min-height:140px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Outfit',sans-serif;font-size:.9rem;padding:.85rem 1rem;outline:none;resize:vertical;transition:border-color .2s;line-height:1.7}
+        .notes-area:focus{border-color:var(--cyan)}
+        .notes-toolbar{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.75rem}
+
+        /* History log */
+        .history-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+        .history-head{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+        .history-head h3{font-size:1rem;font-weight:700}
+        .history-item{padding:.85rem 1.5rem;border-bottom:1px solid rgba(30,45,69,.5);display:flex;align-items:center;gap:1rem}
+        .history-item:last-child{border-bottom:none}
+        .hist-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+        .hist-dot.done{background:var(--success)}
+        .hist-dot.pending{background:var(--border2)}
+        .hist-info{flex:1}
+        .hist-info .htitle{font-size:.88rem;font-weight:600}
+        .hist-info .hmeta{font-size:.75rem;color:var(--muted2);margin-top:.15rem}
+        .hist-badge{font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:100px}
+        .hist-done{background:rgba(34,197,94,.1);color:var(--success)}
+        .hist-pending{background:rgba(90,106,132,.1);color:var(--muted2)}
+        .hist-overdue{background:rgba(239,68,68,.1);color:var(--danger)}
+
+        /* ══ CALENDAR REVISION PAGE ══ */
+        #page-revision{padding-top:58px}
+        .rev-wrap{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+        .rev-wrap h1{font-size:2rem;font-weight:800;margin-bottom:.4rem}
+        .rev-wrap .sub{color:var(--muted2);margin-bottom:2rem}
+        .cal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.5rem;margin-bottom:2rem}
+        .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+        .cal-head h3{font-size:1rem;font-weight:700}
+        .cal-nav{display:flex;gap:.5rem}
+        .cal-nav-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);padding:.3rem .65rem;cursor:pointer;font-size:.85rem;transition:border-color .2s;font-family:'Outfit',sans-serif}
+        .cal-nav-btn:hover{border-color:var(--cyan)}
+        .cal-grid-head{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+        .cal-day-lbl{text-align:center;font-size:.72rem;font-weight:700;color:var(--muted);padding:.25rem;letter-spacing:.06em}
+        .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+        .cal-cell{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;position:relative;border:1px solid transparent;transition:all .15s;background:var(--bg2);color:var(--muted2);cursor:default}
+        .cal-cell.has-rev{background:rgba(0,229,200,.08);border-color:rgba(0,229,200,.2);color:var(--cyan);cursor:pointer}
+        .cal-cell.has-rev:hover{background:rgba(0,229,200,.15)}
+        .cal-cell.has-rev::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--cyan)}
+        .cal-cell.today{border-color:var(--cyan);color:var(--cyan);font-weight:700}
+        .cal-cell.empty{background:transparent;border-color:transparent}
+
+        .due-list-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:1.5rem}
+        .card-head{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+        .card-head h3{font-size:1rem;font-weight:700}
+        .cnt-badge{font-size:.78rem;padding:.2rem .6rem;border-radius:100px;background:rgba(0,229,200,.1);color:var(--cyan);border:1px solid rgba(0,229,200,.2)}
+        .rev-row{padding:.9rem 1.5rem;border-bottom:1px solid rgba(30,45,69,.5);display:flex;align-items:center;gap:1rem;transition:background .15s;cursor:pointer}
+        .rev-row:last-child{border-bottom:none}
+        .rev-row:hover{background:var(--bg2)}
+        .rev-row-info{flex:1}
+        .rev-row-title{font-size:.9rem;font-weight:600;margin-bottom:.2rem}
+        .rev-row-meta{font-size:.78rem;color:var(--muted2)}
+        .rev-due-tag{font-size:.72rem;font-weight:700;padding:.2rem .55rem;border-radius:100px}
+        .tag-overdue{background:rgba(239,68,68,.1);color:var(--danger)}
+        .tag-today{background:rgba(239,68,68,.1);color:var(--danger)}
+        .tag-soon{background:rgba(245,158,11,.1);color:var(--warn)}
+        .rev-done-btn{background:none;border:1px solid var(--border2);cursor:pointer;padding:.3rem .75rem;border-radius:var(--r);color:var(--muted2);font-size:.78rem;font-family:'Outfit',sans-serif;transition:all .2s}
+        .rev-done-btn:hover{border-color:var(--success);color:var(--success)}
+        .intervals-info{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.5rem}
+        .intervals-info h3{font-size:1rem;font-weight:700;margin-bottom:1rem}
+        .int-pills{display:flex;gap:.5rem;flex-wrap:wrap}
+        .int-pill{padding:.4rem .9rem;border-radius:100px;border:1px solid var(--border2);background:var(--bg2);font-size:.78rem;font-weight:600;color:var(--muted2)}
+        .int-pill.active-p{background:rgba(0,229,200,.1);border-color:var(--cyan);color:var(--cyan)}
+
+        /* ══ MODALS ══ */
+        .overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(4px)}
+        .overlay.open{display:flex}
+        .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:2rem;width:100%;max-width:540px;max-height:88vh;overflow-y:auto;box-shadow:0 40px 80px rgba(0,0,0,.5)}
+        .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+        .modal-head h3{font-size:1.1rem;font-weight:700}
+        .close-x{background:none;border:none;cursor:pointer;color:var(--muted2);font-size:1.4rem;line-height:1;transition:color .2s}
+        .close-x:hover{color:var(--danger)}
+        .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .modal-foot{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1rem}
+
+        /* BUTTONS */
+        .btn-sm{padding:.45rem 1rem;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg);color:var(--muted2);font-size:.82rem;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+        .btn-sm:hover{border-color:var(--cyan);color:var(--cyan)}
+        .btn-sm.primary{background:var(--cyan);color:#0a0e17;border-color:var(--cyan)}
+        .btn-sm.primary:hover{background:var(--cyan2)}
+        .btn-sm.danger{border-color:rgba(239,68,68,.3);color:var(--danger)}
+        .btn-sm.danger:hover{background:rgba(239,68,68,.1)}
+
+        /* TOAST */
+        .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:500;background:var(--bg3);border:1px solid var(--border2);padding:.75rem 1.25rem;border-radius:var(--r);font-size:.85rem;font-weight:500;transform:translateY(80px);opacity:0;transition:transform .3s,opacity .3s;box-shadow:0 8px 30px rgba(0,0,0,.4);pointer-events:none;max-width:300px}
+        .toast.show{transform:translateY(0);opacity:1}
+        .toast.ok{border-color:var(--success);color:var(--success)}
+        .toast.err{border-color:var(--danger);color:var(--danger)}
+
+        /* ══ PROBLEMS DASHBOARD PAGE ══ */
+        #page-probdash{padding-top:58px;display:none;min-height:100vh}
+        #page-probdash.active{display:block}
+        .probdash-wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+
+        /* Topic header in prob dash */
+        .pd-header{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.5rem 1.75rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+        .pd-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
+        .pd-header-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+        .pd-header-left{display:flex;align-items:center;gap:.85rem}
+        .pd-num{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(0,229,200,.2),rgba(79,142,247,.2));border:1px solid rgba(0,229,200,.25);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--cyan);flex-shrink:0}
+        .pd-title-box h2{font-size:1.35rem;font-weight:800;margin-bottom:.3rem}
+        .pd-title-box .pd-meta{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+        .pd-header-right{display:flex;gap:.5rem;align-items:center}
+        .pd-stats-row{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap}
+        .pd-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.6rem 1rem;text-align:center;flex:1;min-width:80px}
+        .pd-stat .pds-val{font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--cyan)}
+        .pd-stat .pds-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.15rem}
+
+        /* Concepts strip in prob dash */
+        .pd-concepts{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.5rem}
+        .pd-concept-chip{padding:.3rem .75rem;background:rgba(0,229,200,.06);border:1px solid rgba(0,229,200,.15);border-radius:100px;font-size:.78rem;color:var(--muted2)}
+        .pd-concept-chip::before{content:'›  ';color:var(--cyan)}
+
+        /* Toolbar above problems list */
+        .pd-toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
+        .pd-search{flex:1;min-width:180px;display:flex;align-items:center;gap:.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:.5rem .85rem}
+        .pd-search input{background:none;border:none;outline:none;color:var(--text);font-size:.88rem;font-family:'Outfit',sans-serif;width:100%}
+        .pd-search input::placeholder{color:var(--muted)}
+        .diff-chips{display:flex;gap:.35rem}
+        .diff-chip{padding:.3rem .7rem;border-radius:100px;font-size:.74rem;font-weight:600;border:1px solid var(--border2);background:var(--bg2);color:var(--muted2);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+        .diff-chip:hover{border-color:var(--cyan);color:var(--cyan)}
+        .diff-chip.active{background:var(--cyan);color:#0a0e17;border-color:var(--cyan)}
+
+        /* Problem list in prob dash */
+        .pd-prob-list{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+        .pd-list-head{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.25rem;border-bottom:1px solid var(--border);background:var(--bg2)}
+        .pd-list-head span{font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+        .pd-prob-row{display:flex;align-items:center;gap:.6rem;padding:.7rem 1.25rem;border-bottom:1px solid rgba(30,45,69,.5);transition:background .15s;position:relative}
+        .pd-prob-row:last-child{border-bottom:none}
+        .pd-prob-row:hover{background:var(--bg2)}
+        .pd-prob-row.solved{border-left:3px solid var(--success)}
+        .pd-row-num{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);width:22px;flex-shrink:0;text-align:right}
+        .pd-lc{background:rgba(79,142,247,.15);color:var(--blue);font-size:.68rem;font-weight:700;padding:.18rem .5rem;border-radius:5px;font-family:'Space Mono',monospace;white-space:nowrap;flex-shrink:0;min-width:52px;text-align:center}
+        .pd-name{font-size:.9rem;font-weight:500;flex:1;cursor:pointer;transition:color .15s}
+        .pd-name:hover{color:var(--cyan);text-decoration:underline}
+        .pd-diff{font-size:.7rem;font-weight:700;padding:.18rem .5rem;border-radius:100px;flex-shrink:0}
+        .pd-solved-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.72rem;transition:all .2s;flex-shrink:0;background:none}
+        .pd-solved-check:hover{border-color:var(--success)}
+        .pd-solved-check.done{border-color:var(--success);background:rgba(34,197,94,.15);color:var(--success)}
+        .pd-row-actions{display:flex;gap:.2rem;flex-shrink:0}
+        .pd-icon-btn{background:none;border:none;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.82rem;color:var(--muted);transition:all .2s}
+        .pd-icon-btn:hover{background:var(--bg3);color:var(--text)}
+        .pd-icon-btn.note-active{color:var(--yellow)}
+        .pd-icon-btn.rev-active{color:var(--cyan)}
+        .pd-icon-btn:hover.lc-open{color:var(--orange)}
+        .pd-add-row{padding:1rem 1.25rem;display:flex;justify-content:center}
+
+        /* Empty probs */
+        .pd-empty{text-align:center;padding:3rem 1.5rem;color:var(--muted)}
+        .pd-empty .big{font-size:2.5rem;margin-bottom:.75rem}
+
+        /* Topic card — COMPACT now */
+        .tc-compact-bottom{padding:.75rem 1.25rem;border-top:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+        .tc-compact-stats{display:flex;gap:.75rem}
+        .tc-mini-stat{display:flex;align-items:center;gap:.3rem;font-size:.78rem;color:var(--muted2)}
+        .tc-mini-stat .dot{width:7px;height:7px;border-radius:50%}
+        .dot-solved{background:var(--success)}
+        .dot-rev{background:var(--cyan)}
+        .dot-note{background:var(--yellow)}
+        .view-probs-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;background:rgba(0,229,200,.08);border:1px solid rgba(0,229,200,.25);border-radius:var(--r);color:var(--cyan);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;white-space:nowrap}
+        .view-probs-btn:hover{background:rgba(0,229,200,.15);border-color:var(--cyan)}
+
+        .empty-state{text-align:center;padding:3rem;color:var(--muted);font-size:.9rem}
+        .empty-state .big{font-size:2.5rem;margin-bottom:.75rem}
+        @media(max-width:768px){
+          .stats-row{grid-template-columns:repeat(2,1fr)}
+          .topics-grid{grid-template-columns:1fr}
+          .modal-grid{grid-template-columns:1fr}
+          .topnav{padding:0 1rem}
+          .nav-center .nav-btn:not(.active){display:none}
+          .intervals-master{grid-template-columns:repeat(2,1fr)}
+          .pd-stats-row{flex-wrap:wrap}
+          .pd-stat{min-width:70px}
+          .pd-toolbar{flex-direction:column;align-items:flex-start}
+          .pd-search{max-width:100%;width:100%}
+          .pd-prob-row{flex-wrap:wrap;gap:.4rem}
+          .pd-name{min-width:120px}
+          .tc-compact-bottom{flex-direction:column;align-items:flex-start}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ AUTH ══ -->
+<div id="page-auth" class="page active">
+    <div class="auth-grid"></div>
+    <div class="auth-glow"></div>
+    <div class="auth-box">
+        <div class="auth-logo">⬡ DSA<span>Master</span></div>
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('signin')">Sign In</button>
+            <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+        <div id="auth-signin">
+            <div class="fg"><label>Email</label><input type="email" id="si-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doSignIn()"></div>
+            <div class="fg"><label>Password</label><input type="password" id="si-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doSignIn()"></div>
+            <button class="btn-cyan" onclick="doSignIn()">Sign In →</button>
+            <div class="auth-msg" id="si-msg"></div>
+        </div>
+        <div id="auth-signup" style="display:none">
+            <div class="fg"><label>Full Name</label><input type="text" id="su-name" placeholder="Your name"></div>
+            <div class="fg"><label>Email</label><input type="email" id="su-email" placeholder="you@example.com"></div>
+            <div class="fg"><label>Password</label><input type="password" id="su-pass" placeholder="Min 6 chars"></div>
+            <div class="fg"><label>Confirm Password</label><input type="password" id="su-pass2" placeholder="Repeat" onkeydown="if(event.key==='Enter')doSignUp()"></div>
+            <button class="btn-cyan" onclick="doSignUp()">Create Account →</button>
+            <div class="auth-msg" id="su-msg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav class="topnav" id="topnav" style="display:none">
+    <div class="nav-logo" onclick="goPage('courses')">⬡ DSAMaster</div>
+    <div class="nav-center">
+        <button class="nav-btn" onclick="goPage('courses')">Courses</button>
+        <button class="nav-btn" id="nav-dash" onclick="goPage('dashboard')" style="display:none">Dashboard</button>
+        <button class="nav-btn" id="nav-rev" onclick="goPage('revision')" style="display:none">📅 Revision</button>
+    </div>
+    <div class="nav-right">
+        <div class="nav-avatar" id="nav-avatar">?</div>
+        <button class="nav-signout" onclick="doSignOut()">Sign Out</button>
+    </div>
+</nav>
+
+<!-- ══ COURSES PAGE ══ -->
+<div id="page-courses" class="page">
+    <div class="wrap">
+        <div class="page-tag">📚 Learning Hub</div>
+        <h1>Choose Your Track</h1>
+        <p class="sub">Select a course to start your structured DSA journey.</p>
+        <div class="courses-grid" id="courses-grid"></div>
+    </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="page-dashboard" class="page">
+    <div class="dash-wrap">
+        <div class="dash-hero">
+            <div class="dtrack">DSA TRACK</div>
+            <h1 id="dash-title">Master DSA 360</h1>
+            <p id="dash-desc">60-day structured roadmap — Learn, Code, Practice & Master every pattern.</p>
+        </div>
+        <div class="stats-row">
+            <div class="stat-box"><div class="val" id="st-days">0</div><div class="lbl">Days Done</div></div>
+            <div class="stat-box"><div class="val" id="st-lec">0</div><div class="lbl">Lectures</div></div>
+            <div class="stat-box"><div class="val" id="st-prob">0</div><div class="lbl">Solved</div></div>
+            <div class="stat-box"><div class="val" id="st-rev">0</div><div class="lbl">Revisions Done</div></div>
+        </div>
+        <div class="progress-card">
+            <div class="prog-head"><span style="font-size:.85rem;color:var(--muted2)">Overall Progress</span><span id="prog-pct" style="font-family:'Space Mono',monospace;font-size:.85rem;color:var(--cyan)">0%</span></div>
+            <div class="prog-label" id="prog-label">0 of 0 tasks completed</div>
+            <div class="prog-bar-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
+        </div>
+        <div class="filters-row">
+            <div class="search-box">
+                <span style="color:var(--muted)">🔍</span>
+                <input type="text" id="search-input" placeholder="Search topics, day or problem..." oninput="filterTopics()">
+            </div>
+            <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+                <button class="chip active" onclick="setPhase('all',this)">All Days</button>
+                <button class="chip" onclick="setPhase('P1',this)">Phase 1</button>
+                <button class="chip" onclick="setPhase('P2',this)">Phase 2</button>
+                <button class="chip" onclick="setPhase('P3',this)">Phase 3</button>
+                <button class="chip" onclick="setPhase('P4',this)">Phase 4</button>
+            </div>
+            <button class="playlist-btn" onclick="window.open('https://youtube.com','_blank')">▶ Full Playlist</button>
+        </div>
+        <div class="topics-grid" id="topics-grid"></div>
+    </div>
+</div>
+
+<!-- ══ PER-PROBLEM REVISION DASHBOARD ══ -->
+<div id="page-revdash" class="page">
+    <div class="revdash-wrap">
+        <button class="back-btn" onclick="goBack()">← Back to Dashboard</button>
+
+        <!-- Problem Hero -->
+        <div class="prob-hero">
+            <div class="prob-hero-top">
+                <div class="prob-hero-left">
+                    <h2 id="rd-prob-name">Problem Name</h2>
+                    <div class="meta">
+                        <span id="rd-lc-badge" class="prob-lc" style="font-size:.8rem;padding:.25rem .7rem">LC 0</span>
+                        <span id="rd-diff-badge" class="prob-diff diff-med">Medium</span>
+                        <span id="rd-topic-badge" style="font-size:.78rem;color:var(--muted2)">Topic Name</span>
+                    </div>
+                </div>
+                <div class="prob-hero-right">
+                    <a id="rd-lc-link" href="#" target="_blank" class="btn-lc">🔗 Open LeetCode</a>
+                    <button id="rd-solve-btn" class="btn-solved" onclick="toggleSolvedFromRevDash()">✓ Mark Solved</button>
+                </div>
+            </div>
+            <!-- Solve date info -->
+            <div id="rd-solve-info" style="font-size:.82rem;color:var(--muted2);margin-top:.5rem;display:none">
+                📅 First solved: <span id="rd-solve-date" style="color:var(--cyan)"></span>
+            </div>
+        </div>
+
+        <!-- Revision Intervals -->
+        <div class="rev-intervals-title">🔄 Spaced Repetition Schedule</div>
+        <div class="intervals-master" id="rd-intervals"></div>
+
+        <!-- Notes -->
+        <div class="notes-section">
+            <h3>📝 My Notes</h3>
+            <textarea class="notes-area" id="rd-notes" placeholder="Write your notes here...&#10;&#10;• Key observations&#10;• Approach / Algorithm&#10;• Time & Space Complexity&#10;• Edge cases"></textarea>
+            <div class="notes-toolbar">
+                <button class="btn-sm danger" onclick="deleteRevNote()">Delete</button>
+                <button class="btn-sm primary" onclick="saveRevNote()">Save Notes</button>
+            </div>
+        </div>
+
+        <!-- Revision History -->
+        <div class="history-section">
+            <div class="history-head">
+                <h3>📊 Revision History</h3>
+                <span id="rd-history-count" class="cnt-badge">0 revisions</span>
+            </div>
+            <div id="rd-history-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ PROBLEMS DASHBOARD PAGE ══ -->
+<div id="page-probdash" class="page">
+    <div class="probdash-wrap">
+        <button class="back-btn" onclick="goPage('dashboard')">← Back to Dashboard</button>
+        <div class="pd-header">
+            <div class="pd-header-top">
+                <div class="pd-header-left">
+                    <div class="pd-num" id="pd-num">1</div>
+                    <div class="pd-title-box">
+                        <h2 id="pd-title">Topic Name</h2>
+                        <div class="pd-meta">
+                            <span id="pd-phase" class="tc-phase">P1</span>
+                            <a id="pd-lec-link" href="#" target="_blank" class="lec-btn" style="margin:0;display:none">▶ Lecture</a>
+                            <button id="pd-lec-add" class="lec-btn" style="margin:0;display:none" onclick="pdAddLec()">▶ Add Lecture URL</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="pd-header-right">
+                    <button class="btn-sm primary" onclick="openAddProblemPD()">+ Add Problem</button>
+                </div>
+            </div>
+            <div class="pd-stats-row">
+                <div class="pd-stat"><div class="pds-val" id="pds-total">0</div><div class="pds-lbl">Total</div></div>
+                <div class="pd-stat"><div class="pds-val" id="pds-solved">0</div><div class="pds-lbl">Solved</div></div>
+                <div class="pd-stat"><div class="pds-val" id="pds-easy">0</div><div class="pds-lbl">Easy</div></div>
+                <div class="pd-stat"><div class="pds-val" id="pds-med">0</div><div class="pds-lbl">Medium</div></div>
+                <div class="pd-stat"><div class="pds-val" id="pds-hard">0</div><div class="pds-lbl">Hard</div></div>
+                <div class="pd-stat"><div class="pds-val" id="pds-rev">0</div><div class="pds-lbl">Rev Done</div></div>
+            </div>
+        </div>
+        <div class="pd-concepts" id="pd-concepts"></div>
+        <div class="pd-toolbar">
+            <div class="pd-search">
+                <span style="color:var(--muted)">🔍</span>
+                <input type="text" id="pd-search" placeholder="Search problems..." oninput="pdFilter()">
+            </div>
+            <div class="diff-chips">
+                <button class="diff-chip active" onclick="pdSetDiff('all',this)">All</button>
+                <button class="diff-chip" onclick="pdSetDiff('Easy',this)" style="color:var(--success)">Easy</button>
+                <button class="diff-chip" onclick="pdSetDiff('Medium',this)" style="color:var(--warn)">Medium</button>
+                <button class="diff-chip" onclick="pdSetDiff('Hard',this)" style="color:var(--danger)">Hard</button>
+                <button class="diff-chip" onclick="pdSetDiff('unsolved',this)">Unsolved</button>
+            </div>
+        </div>
+        <div class="pd-prob-list">
+            <div class="pd-list-head">
+                <span style="font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase"># &nbsp; Problem</span>
+                <span id="pd-count-label" style="font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">0 problems</span>
+            </div>
+            <div id="pd-prob-rows"></div>
+            <div class="pd-add-row">
+                <button class="btn-sm" onclick="openAddProblemPD()">＋ Add New Problem</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ CALENDAR REVISION PAGE ══ -->
+<div id="page-revision" class="page">
+    <div class="rev-wrap">
+        <h1>📅 Revision Tracker</h1>
+        <p class="sub">Your spaced repetition calendar — never forget what you've learned.</p>
+        <div class="cal-card">
+            <div class="cal-head">
+                <h3 id="cal-title">May 2026</h3>
+                <div class="cal-nav">
+                    <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+                    <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+                </div>
+            </div>
+            <div class="cal-grid-head" id="cal-head"></div>
+            <div class="cal-grid" id="cal-grid"></div>
+        </div>
+        <div class="due-list-card">
+            <div class="card-head"><h3>🚨 Due Today & Overdue</h3><span class="cnt-badge" id="due-count">0 items</span></div>
+            <div id="due-list"><div class="empty-state"><div class="big">🎉</div>No revisions due!</div></div>
+        </div>
+        <div class="due-list-card">
+            <div class="card-head"><h3>⏳ Upcoming (7 days)</h3><span class="cnt-badge" id="upcoming-count">0 items</span></div>
+            <div id="upcoming-list"><div class="empty-state"><div class="big">✨</div>Nothing upcoming</div></div>
+        </div>
+        <div class="intervals-info">
+            <h3>Revision Intervals</h3>
+            <div class="int-pills" id="int-pills">
+                <span class="int-pill">Day 1</span><span class="int-pill">Day 3</span><span class="int-pill">Day 5</span>
+                <span class="int-pill">Day 10</span><span class="int-pill">Day 15</span><span class="int-pill">Day 30</span>
+                <span class="int-pill">Day 60</span><span class="int-pill">Day 120</span><span class="int-pill">Day 150</span>
+                <span class="int-pill">Day 200</span><span class="int-pill">Day 250</span><span class="int-pill">Day 300</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ ADD TOPIC MODAL ══ -->
+<div class="overlay" id="modal-topic">
+    <div class="modal" style="max-width:560px">
+        <div class="modal-head"><h3>Add New Topic</h3><button class="close-x" onclick="closeModal('modal-topic')">×</button></div>
+        <div class="modal-grid">
+            <div class="fg"><label>Topic Title *</label><input type="text" id="tm-title" placeholder="e.g. Binary Search"></div>
+            <div class="fg"><label>Phase</label><select id="tm-phase"><option value="P1">Phase 1</option><option value="P2">Phase 2</option><option value="P3">Phase 3</option><option value="P4">Phase 4</option></select></div>
+        </div>
+        <div class="fg"><label>Concepts (one per line)</label><textarea id="tm-concepts" placeholder="Big-O Notation&#10;Worst/Best Case"></textarea></div>
+        <div class="fg"><label>Lecture URL</label><input type="url" id="tm-lec-url" placeholder="https://youtube.com/..."></div>
+        <div class="modal-foot">
+            <button class="btn-sm" onclick="closeModal('modal-topic')">Cancel</button>
+            <button class="btn-sm primary" onclick="saveTopic()">Add Topic</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ ADD PROBLEM MODAL ══ -->
+<div class="overlay" id="modal-prob">
+    <div class="modal">
+        <div class="modal-head"><h3>Add Problem</h3><button class="close-x" onclick="closeModal('modal-prob')">×</button></div>
+        <input type="hidden" id="pm-tid">
+        <div class="fg"><label>Problem Name *</label><input type="text" id="pm-name" placeholder="e.g. Valid Parentheses"></div>
+        <div class="modal-grid">
+            <div class="fg"><label>LeetCode Number</label><input type="number" id="pm-lc" placeholder="20"></div>
+            <div class="fg"><label>Difficulty</label><select id="pm-diff"><option>Easy</option><option selected>Medium</option><option>Hard</option></select></div>
+        </div>
+        <div class="fg"><label>LeetCode URL</label><input type="url" id="pm-url" placeholder="https://leetcode.com/problems/..."></div>
+        <div class="modal-foot">
+            <button class="btn-sm" onclick="closeModal('modal-prob')">Cancel</button>
+            <button class="btn-sm primary" onclick="saveProblem()">Add Problem</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ ADD COURSE MODAL ══ -->
+<div class="overlay" id="modal-course">
+    <div class="modal">
+        <div class="modal-head"><h3>Create Custom Course</h3><button class="close-x" onclick="closeModal('modal-course')">×</button></div>
+        <div class="fg"><label>Course Name *</label><input type="text" id="cm-name" placeholder="e.g. My DSA Plan"></div>
+        <div class="fg"><label>Description</label><input type="text" id="cm-desc" placeholder="What will you learn?"></div>
+        <div class="fg"><label>Icon (emoji)</label><input type="text" id="cm-icon" placeholder="🧠" maxlength="2"></div>
+        <div class="modal-foot">
+            <button class="btn-sm" onclick="closeModal('modal-course')">Cancel</button>
+            <button class="btn-sm primary" onclick="saveCourse()">Create</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // ══════════════════════════════════════
+    // DATA
+    // ══════════════════════════════════════
+    const DB={
+      get(k){try{return JSON.parse(localStorage.getItem('dsam_'+k)||'null')}catch{return null}},
+      set(k,v){localStorage.setItem('dsam_'+k,JSON.stringify(v))}
+    };
+
+    let users    = DB.get('users')||[];
+    let curUser  = DB.get('cur')||null;
+    let courses  = DB.get('courses')||[];
+    let topics   = DB.get('topics')||{};
+    let progress = DB.get('progress')||{};
+    let notes    = DB.get('notes')||{};
+    let revs     = DB.get('revs')||{};     // key: "tid_pid" → { solvedDate, intervals:{1:bool,3:bool,...} }
+    let curCourse= DB.get('curCourse')||null;
+
+    let activePhase='all';
+    let prevPage='dashboard';
+    let curRevKey=null; // current problem key in rev dashboard
+
+    const REV_DAYS=[1,3,5,10,15,30,60,120,150,200,250,300];
+
+    function save(){
+      DB.set('users',users);DB.set('cur',curUser);
+      DB.set('courses',courses);DB.set('topics',topics);
+      DB.set('progress',progress);DB.set('notes',notes);
+      DB.set('revs',revs);DB.set('curCourse',curCourse);
+    }
+
+    // ──────────────────── SEED ────────────────────
+    function seedDefaults(){
+      if(courses.length>0)return;
+      courses.push({id:'dsa360',name:'Master DSA 360',desc:'60-day structured roadmap — Learn, Code, Practice & Master every pattern. LeetCode-backed, interview-ready.',icon:'🧠',badge:'ongoing'});
+      topics['dsa360']=[
+        mkT(1,'Time & Space Complexity','P1','',['Big-O Notation','Worst/Average/Best Case','O(1) O(n) O(log n)'],[
+          mkP(1480,'Running Sum of 1D Array','Easy'),mkP(1929,'Concatenation of Array','Easy'),mkP(136,'Single Number','Easy')]),
+        mkT(2,'STL / Collections','P1','',['Vectors','Maps & HashMaps','Sets & Sorting'],[
+          mkP(217,'Contains Duplicate','Easy'),mkP(242,'Valid Anagram','Easy'),mkP(1,'Two Sum','Easy')]),
+        mkT(3,'Arrays Basics','P1','',['Array Traversal','Prefix Sum','Kadane Algorithm'],[
+          mkP(53,'Maximum Subarray','Medium'),mkP(121,'Buy and Sell Stock','Easy'),mkP(26,'Remove Duplicates','Easy')]),
+        mkT(4,'Arrays Advanced','P1','',['Prefix Sum Optimization','Hashing Tricks','Subarrays'],[
+          mkP(560,'Subarray Sum Equals K','Medium'),mkP(238,'Product Except Self','Medium')]),
+        mkT(5,'Binary Search','P1','',['Binary Search Patterns','Lower/Upper Bound','Search Rotated'],[
+          mkP(704,'Binary Search','Easy'),mkP(33,'Search in Rotated Array','Medium'),mkP(153,'Find Min in Rotated','Medium')]),
+        mkT(6,'Sorting','P1','',['Merge Sort','Quick Sort','Counting Sort'],[
+          mkP(912,'Sort an Array','Medium'),mkP(75,'Sort Colors','Medium')]),
+        mkT(7,'Two Pointers','P1','',['Left-Right Pointer','Fast-Slow Pointer','Partitioning'],[
+          mkP(167,'Two Sum II','Medium'),mkP(11,'Container Most Water','Medium'),mkP(42,'Trapping Rain Water','Hard')]),
+        mkT(8,'Strings','P1','',['String Manipulation','Pattern Matching','Palindromes'],[
+          mkP(125,'Valid Palindrome','Easy'),mkP(5,'Longest Palindromic Substring','Medium')]),
+        mkT(9,'Linked List','P2','',['Traversal & Reversal','Cycle Detection','Merge Lists'],[
+          mkP(206,'Reverse Linked List','Easy'),mkP(21,'Merge Two Sorted Lists','Easy'),mkP(141,'Linked List Cycle','Easy')]),
+        mkT(10,'Trees','P2','',['DFS / BFS','Tree Traversals','BST Operations'],[
+          mkP(104,'Max Depth Binary Tree','Easy'),mkP(226,'Invert Binary Tree','Easy'),mkP(98,'Validate BST','Medium')]),
+        mkT(11,'Graphs','P2','',['BFS & DFS','Connected Components','Shortest Path'],[
+          mkP(200,'Number of Islands','Medium'),mkP(133,'Clone Graph','Medium'),mkP(207,'Course Schedule','Medium')]),
+        mkT(12,'Dynamic Programming','P3','',['Memoization','Tabulation','DP Patterns'],[
+          mkP(70,'Climbing Stairs','Easy'),mkP(322,'Coin Change','Medium'),mkP(300,'Longest Increasing Subsequence','Medium')]),
+        mkT(13,'Stack','P2','',['LIFO Operations','Monotonic Stack','Expression Evaluation'],[
+          mkP(20,'Valid Parentheses','Easy'),mkP(155,'Min Stack','Medium'),mkP(739,'Daily Temperatures','Medium')]),
+        mkT(14,'Queue','P2','',['FIFO Operations','Deque Applications','Priority Queue'],[
+          mkP(232,'Queue using Stacks','Easy'),mkP(933,'Recent Calls','Easy'),mkP(622,'Circular Queue','Medium')]),
+        mkT(15,'Sliding Window','P2','',['Window Expansion','Window Contraction','Optimal Length'],[
+          mkP(3,'Longest Substring No Repeat','Medium'),mkP(209,'Min Size Subarray','Medium'),mkP(1004,'Max Consecutive Ones','Medium')])
+      ];
+      save();
+    }
+
+    function mkT(num,title,phase,lecUrl,concepts,problems){
+      return {id:'t'+num,num,title,phase,lecUrl,concepts,problems};
+    }
+    function mkP(lc,name,diff){
+      return {id:'p'+lc,lc,name,diff,url:`https://leetcode.com/problems/${name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'')}/`};
+    }
+
+    // ══════════════════════════════════════
+    // AUTH
+    // ══════════════════════════════════════
+    function switchTab(tab){
+      document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='signin'?0:1)));
+      document.getElementById('auth-signin').style.display=tab==='signin'?'':'none';
+      document.getElementById('auth-signup').style.display=tab==='signup'?'':'none';
+    }
+    function doSignIn(){
+      const email=v('si-email').toLowerCase(),pass=v('si-pass');
+      const msg=el('si-msg');
+      const u=users.find(x=>x.email===email&&x.pass===pass);
+      if(!u)return setMsg(msg,'Invalid email or password','err');
+      curUser={email,name:u.name};save();updateNav();
+      setMsg(msg,'Welcome back, '+u.name+'!','ok');
+      setTimeout(()=>{renderCourses();goPage('courses')},600);
+    }
+    function doSignUp(){
+      const name=v('su-name'),email=v('su-email').toLowerCase(),pass=v('su-pass'),pass2=v('su-pass2');
+      const msg=el('su-msg');
+      if(!name||!email||!pass)return setMsg(msg,'Please fill all fields','err');
+      if(pass.length<6)return setMsg(msg,'Password min 6 chars','err');
+      if(pass!==pass2)return setMsg(msg,'Passwords do not match','err');
+      if(users.find(x=>x.email===email))return setMsg(msg,'Email already registered','err');
+      users.push({name,email,pass});
+      curUser={email,name};save();updateNav();
+      setMsg(msg,'Account created!','ok');
+      setTimeout(()=>{renderCourses();goPage('courses')},700);
+    }
+    function doSignOut(){
+      curUser=null;curCourse=null;save();
+      el('topnav').style.display='none';
+      el('nav-dash').style.display='none';
+      el('nav-rev').style.display='none';
+      goPage('auth');
+    }
+
+    // ══════════════════════════════════════
+    // NAVIGATION
+    // ══════════════════════════════════════
+    function goPage(id){
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      el('page-'+id).classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+      if(id==='courses'){renderCourses();document.querySelectorAll('.nav-btn')[0]?.classList.add('active')}
+      if(id==='dashboard'){renderDashboard();el('nav-dash')?.classList.add('active')}
+      if(id==='revision'){renderRevision();el('nav-rev')?.classList.add('active')}
+      if(id!=='revdash')prevPage=id;
+      window.scrollTo(0,0);
+    }
+    function goBack(){goPage(prevPage||'dashboard')}
+
+    function updateNav(){
+      const in_=!!curUser;
+      el('topnav').style.display=in_?'flex':'none';
+      if(curUser){
+        const init=(curUser.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+        el('nav-avatar').textContent=init;
+      }
+    }
+
+    // ══════════════════════════════════════
+    // COURSES
+    // ══════════════════════════════════════
+    function renderCourses(){
+      const grid=el('courses-grid');
+      let html=courses.map(c=>`
+        <div class="course-card" onclick="openCourse('${c.id}')">
+          <div class="cc-top"><div class="cc-icon">${c.icon||'🧠'}</div><span class="cc-badge badge-${c.badge||'new'}">${c.badge||'New'}</span></div>
+          <div class="cc-title">${esc(c.name)}</div>
+          <div class="cc-desc">${esc(c.desc)}</div>
+          <ul class="cc-features"><li>Structured step-by-step path</li><li>LeetCode problem sets</li><li>Spaced repetition revision</li><li>Notes per problem</li></ul>
+          <button class="cc-btn">View Course →</button>
+        </div>`).join('');
+      html+=`<div class="add-course-card" onclick="openModal('modal-course')"><div style="font-size:2rem">＋</div><div style="font-weight:600">Create Custom Course</div><div style="font-size:.82rem">Add your own DSA plan</div></div>`;
+      grid.innerHTML=html;
+    }
+    function openCourse(id){
+      curCourse=id;save();
+      el('nav-dash').style.display='';el('nav-rev').style.display='';
+      goPage('dashboard');
+    }
+    function saveCourse(){
+      const name=v('cm-name');if(!name)return toast('Course name required','err');
+      const id='c'+Date.now();
+      courses.push({id,name,desc:v('cm-desc'),icon:v('cm-icon')||'📘',badge:'new'});
+      topics[id]=[];save();closeModal('modal-course');renderCourses();toast('Course created!');
+    }
+
+    // ══════════════════════════════════════
+    // DASHBOARD
+    // ══════════════════════════════════════
+    function renderDashboard(){
+      if(!curCourse)return;
+      const c=courses.find(x=>x.id===curCourse);
+      if(c){el('dash-title').textContent=c.name;el('dash-desc').textContent=c.desc||'';}
+      const ts=topics[curCourse]||[];
+      renderTopicsGrid(ts);
+      updateStats(ts);
+    }
+
+    function renderTopicsGrid(ts,filter='',phase='all'){
+      const grid=el('topics-grid');
+      let filtered=ts;
+      if(phase!=='all')filtered=filtered.filter(t=>t.phase===phase);
+      if(filter)filtered=filtered.filter(t=>
+        t.title.toLowerCase().includes(filter)||
+        (t.concepts||[]).some(c=>c.toLowerCase().includes(filter))||
+        (t.problems||[]).some(p=>p.name.toLowerCase().includes(filter)||String(p.lc).includes(filter))
+      );
+      let html=filtered.map(t=>renderTopicCard(t)).join('');
+      html+=`<div class="add-topic-card" onclick="openModal('modal-topic')"><div style="font-size:2rem">＋</div><div style="font-weight:600;font-size:.95rem">Add New Topic</div><div style="font-size:.82rem">Add a DSA topic with problems</div></div>`;
+      grid.innerHTML=html;
+    }
+
+    function renderTopicCard(t){
+      const pg=progress[t.id]||{};
+      const probs=t.problems||[];
+      const solved=probs.filter(p=>pg[p.id+'_s']).length;
+      const totalRevDone=probs.reduce((a,p)=>{
+        const r=revs[t.id+'_'+p.id];
+        return a+(r?Object.values(r.intervals||{}).filter(Boolean).length:0);
+      },0);
+      const notesCount=probs.filter(p=>notes[t.id+'_'+p.id]).length;
+      const easy=probs.filter(p=>p.diff==='Easy').length;
+      const med=probs.filter(p=>p.diff==='Medium').length;
+      const hard=probs.filter(p=>p.diff==='Hard').length;
+
+      const concepts=(t.concepts||[]).slice(0,3).map(c=>`<div class="concept-item">${esc(c)}</div>`).join('');
+      const moreC=(t.concepts||[]).length>3?`<div class="concept-item" style="color:var(--muted)">+${(t.concepts||[]).length-3} more</div>`:'';
+
+      const cbLec=pg.lec?'checked':'',cbProb=pg.prob?'checked':'',cbPrac=pg.prac?'checked':'',cbDay=pg.day?'checked':'';
+      const lecHtml=t.lecUrl
+        ?`<a class="lec-btn" href="${t.lecUrl}" target="_blank" style="margin:.5rem 0 0">▶ Lecture</a>`
+        :`<button class="lec-btn" onclick="promptLecUrl('${t.id}')" style="margin:.5rem 0 0">▶ Add Lecture URL</button>`;
+
+      const pct=probs.length?Math.round(solved/probs.length*100):0;
+
+      return `<div class="topic-card">
+        <div class="tc-top">
+          <div class="tc-num">${t.num}</div>
+          <div class="tc-title">${esc(t.title)}</div>
+          <span class="tc-phase">${t.phase}</span>
+        </div>
+        <div class="tc-body">
+          <div class="sec-label">Concepts</div>
+          ${concepts}${moreC}
+          ${lecHtml}
+          <div style="margin-top:1rem;background:var(--bg2);border-radius:var(--r);padding:.6rem .85rem;border:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem">
+              <span style="font-size:.75rem;color:var(--muted2)">${solved}/${probs.length} solved</span>
+              <span style="font-size:.72rem;font-family:'Space Mono',monospace;color:var(--cyan)">${pct}%</span>
+            </div>
+            <div style="background:var(--border);border-radius:100px;height:5px;overflow:hidden">
+              <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:100px;transition:width .4s"></div>
+            </div>
+            <div style="display:flex;gap:.75rem;margin-top:.5rem;flex-wrap:wrap">
+              <span style="font-size:.72rem;color:var(--success)">✓ ${easy} Easy</span>
+              <span style="font-size:.72rem;color:var(--warn)">◆ ${med} Med</span>
+              <span style="font-size:.72rem;color:var(--danger)">★ ${hard} Hard</span>
+              ${notesCount?`<span style="font-size:.72rem;color:var(--yellow)">📝 ${notesCount} Notes</span>`:''}
+              ${totalRevDone?`<span style="font-size:.72rem;color:var(--cyan)">🔄 ${totalRevDone} Rev</span>`:''}
+            </div>
+          </div>
+        </div>
+        <div class="tc-compact-bottom">
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <label class="cb-item"><input type="checkbox" ${cbLec} onchange="togProg('${t.id}','lec',this.checked)"> Lecture</label>
+            <label class="cb-item"><input type="checkbox" ${cbPrac} onchange="togProg('${t.id}','prac',this.checked)"> Practice</label>
+            <label class="cb-item"><input type="checkbox" ${cbDay} onchange="togProg('${t.id}','day',this.checked)"> Day ✓</label>
+          </div>
+          <button class="view-probs-btn" onclick="openProbDash('${t.id}')">
+            View Problems (${probs.length}) →
+          </button>
+        </div>
+      </div>`;
+    }
+
+    function updateStats(ts){
+      ts=ts||(topics[curCourse]||[]);
+      let days=0,lecs=0,probs=0,totalRev=0,doneRev=0;
+      ts.forEach(t=>{
+        const pg=progress[t.id]||{};
+        if(pg.day)days++;if(pg.lec)lecs++;
+        (t.problems||[]).forEach(p=>{
+          if(pg[p.id+'_s'])probs++;
+          const r=revs[t.id+'_'+p.id];
+          if(r&&r.intervals){
+            REV_DAYS.forEach(d=>{totalRev++;if(r.intervals[d])doneRev++;});
+          }
+        });
+      });
+      const total=ts.length*3;const done=lecs+(progress[curCourse+'_prob']||0)+(progress[curCourse+'_prac']||0);
+      const solved=ts.reduce((a,t)=>{const pg=progress[t.id]||{};return a+(t.problems||[]).filter(p=>pg[p.id+'_s']).length},0);
+      const allProb=ts.reduce((a,t)=>a+(t.problems||[]).length,0);
+      const pct=allProb?Math.round(solved/allProb*100):0;
+      el('st-days').textContent=days;
+      el('st-lec').textContent=lecs;
+      el('st-prob').textContent=solved;
+      el('st-rev').textContent=doneRev;
+      el('prog-pct').textContent=pct+'%';
+      el('prog-label').textContent=solved+' of '+allProb+' problems solved';
+      el('prog-bar').style.width=pct+'%';
+    }
+
+    function filterTopics(){
+      const ts=topics[curCourse]||[];
+      renderTopicsGrid(ts,(v('search-input')||'').toLowerCase(),activePhase);
+    }
+    function setPhase(ph,btn){
+      activePhase=ph;
+      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      btn.classList.add('active');filterTopics();
+    }
+    function togProg(tid,field,val){
+      if(!progress[tid])progress[tid]={};
+      progress[tid][field]=val;save();updateStats();
+    }
+    function promptLecUrl(tid){
+      const url=prompt('Enter lecture URL:');if(!url)return;
+      const ts=topics[curCourse]||[];const t=ts.find(x=>x.id===tid);
+      if(t){t.lecUrl=url;save();renderDashboard();}
+    }
+
+    // ══════════════════════════════════════
+    // OPEN LEETCODE + MARK SOLVED
+    // ══════════════════════════════════════
+    function openLeetCode(url,tid,pid){
+      if(url&&url!=='#')window.open(url,'_blank');
+      markSolved(tid,pid);
+    }
+    function markSolved(tid,pid){
+      if(!progress[tid])progress[tid]={};
+      if(progress[tid][pid+'_s'])return; // already solved
+      progress[tid][pid+'_s']=true;
+      progress[tid][pid+'_sdate']=todayStr();
+      // Auto-schedule revision
+      const key=tid+'_'+pid;
+      if(!revs[key]){
+        revs[key]={solvedDate:todayStr(),intervals:{}};
+        save();
+        toast('✅ Solved! Revision scheduled for 12 intervals 🔄');
+      } else {
+        save();
+      }
+      updateStats();
+      const ts=topics[curCourse]||[];
+      renderTopicsGrid(ts,(v('search-input')||'').toLowerCase(),activePhase);
+    }
+
+    // ══════════════════════════════════════
+    // PER-PROBLEM REVISION DASHBOARD
+    // ══════════════════════════════════════
+    function openRevDash(tid,pid){
+      const ts=topics[curCourse]||[];
+      const t=ts.find(x=>x.id===tid);
+      const p=t?.problems?.find(x=>x.id===pid);
+      if(!t||!p)return;
+      curRevKey=tid+'_'+pid;
+      prevPage=document.querySelector('.page.active')?.id?.replace('page-','')||'dashboard';
+
+      // Fill hero
+      el('rd-prob-name').textContent=p.name;
+      el('rd-lc-badge').textContent='LC '+p.lc;
+      const diffCls=p.diff==='Easy'?'diff-easy':p.diff==='Hard'?'diff-hard':'diff-med';
+      el('rd-diff-badge').className='prob-diff '+diffCls;
+      el('rd-diff-badge').textContent=p.diff;
+      el('rd-topic-badge').textContent=t.title;
+      el('rd-lc-link').href=p.url||'#';
+
+      // Solve status
+      const pg=progress[tid]||{};
+      const isSolved=!!pg[pid+'_s'];
+      const solveDate=pg[pid+'_sdate']||'';
+      const solveBtn=el('rd-solve-btn');
+      solveBtn.textContent=isSolved?'✓ Solved!':'✓ Mark Solved';
+      solveBtn.className='btn-solved'+(isSolved?' is-solved':'');
+      if(solveDate){el('rd-solve-info').style.display='';el('rd-solve-date').textContent=fmtDate(solveDate);}
+      else{el('rd-solve-info').style.display='none';}
+
+      // Notes
+      el('rd-notes').value=notes[curRevKey]||'';
+
+      // Intervals
+      renderRevIntervals(tid,pid,solveDate);
+
+      // History
+      renderRevHistory(tid,pid,solveDate);
+
+      goPage('revdash');
+    }
+
+    function renderRevIntervals(tid,pid,solveDate){
+      const key=tid+'_'+pid;
+      const r=revs[key]||{};
+      const ints=r.intervals||{};
+      const today=todayStr();
+
+      const html=REV_DAYS.map(d=>{
+        const dueDate=solveDate?addDays(solveDate,d):'—';
+        const isDone=!!ints[d];
+        const diff=solveDate?daysBetween(today,dueDate):99;
+        let cls='interval-card future',labelTxt='Scheduled',labelCls='future-lbl';
+        if(isDone){cls='interval-card done-card';labelTxt='✓ Done';labelCls='done-lbl';}
+        else if(diff<0){cls='interval-card due-today';labelTxt='Overdue';labelCls='today-lbl';}
+        else if(diff===0){cls='interval-card due-today';labelTxt='Due Today!';labelCls='today-lbl';}
+        else if(diff<=7){cls='interval-card upcoming';labelTxt='In '+diff+' days';labelCls='soon-lbl';}
+
+        const checkCls=isDone?'int-check checked':(diff<=0&&!isDone?'int-check due':'int-check');
+        const checkIcon=isDone?'✓':(diff<=0?'!':'○');
+
+        return `<div class="${cls}">
+          <div class="int-left">
+            <div class="int-day">Day ${d}</div>
+            <div class="int-date">${dueDate!=='—'?fmtDate(dueDate):'Set solve date'}</div>
+            <div class="int-label ${labelCls}">${labelTxt}</div>
+          </div>
+          <button class="${checkCls}" onclick="toggleInterval('${key}',${d},this)" title="${isDone?'Mark undone':'Mark done'}">${checkIcon}</button>
+        </div>`;
+      }).join('');
+      el('rd-intervals').innerHTML=html;
+    }
+
+    function toggleInterval(key,day,btn){
+      if(!revs[key])revs[key]={solvedDate:todayStr(),intervals:{}};
+      if(!revs[key].intervals)revs[key].intervals={};
+      const was=!!revs[key].intervals[day];
+      revs[key].intervals[day]=!was;
+      save();
+      // Update button
+      if(!was){
+        btn.className='int-check checked';btn.textContent='✓';
+        btn.closest('.interval-card').className='interval-card done-card';
+        const lbl=btn.closest('.interval-card').querySelector('.int-label');
+        lbl.className='int-label done-lbl';lbl.textContent='✓ Done';
+        toast('Revision Day '+day+' done! 🎉');
+      } else {
+        btn.className='int-check';btn.textContent='○';
+        toast('Unmarked');
+      }
+      // Re-render history
+      const [tid,pid]=key.split('_');
+      const pg=progress[tid]||{};
+      renderRevHistory(tid,pid,pg[pid+'_sdate']||'');
+      updateStats();
+    }
+
+    function renderRevHistory(tid,pid,solveDate){
+      const key=tid+'_'+pid;
+      const r=revs[key]||{};
+      const ints=r.intervals||{};
+      const today=todayStr();
+      const doneCount=REV_DAYS.filter(d=>ints[d]).length;
+      el('rd-history-count').textContent=doneCount+' / '+REV_DAYS.length+' done';
+
+      const rows=REV_DAYS.map(d=>{
+        const isDone=!!ints[d];
+        const dueDate=solveDate?addDays(solveDate,d):'—';
+        const diff=solveDate?daysBetween(today,dueDate):99;
+        let badge,dotCls;
+        if(isDone){badge='<span class="hist-badge hist-done">Done</span>';dotCls='done';}
+        else if(diff<0){badge='<span class="hist-badge hist-overdue">Overdue</span>';dotCls='pending';}
+        else if(diff===0){badge='<span class="hist-badge hist-overdue">Due Today</span>';dotCls='pending';}
+        else{badge='<span class="hist-badge hist-pending">Pending</span>';dotCls='pending';}
+        return `<div class="history-item">
+          <div class="hist-dot ${dotCls}"></div>
+          <div class="hist-info">
+            <div class="htitle">Day ${d} Revision</div>
+            <div class="hmeta">${dueDate!=='—'?'Scheduled: '+fmtDate(dueDate):'Not scheduled yet'}</div>
+          </div>
+          ${badge}
+        </div>`;
+      }).join('');
+      el('rd-history-list').innerHTML=rows||'<div class="empty-state"><div class="big">📋</div>No revision history yet</div>';
+    }
+
+    function toggleSolvedFromRevDash(){
+      if(!curRevKey)return;
+      const [tid,pid]=curRevKey.split('_');
+      markSolved(tid,pid);
+      const pg=progress[tid]||{};
+      const isSolved=!!pg[pid+'_s'];
+      el('rd-solve-btn').textContent=isSolved?'✓ Solved!':'✓ Mark Solved';
+      el('rd-solve-btn').className='btn-solved'+(isSolved?' is-solved':'');
+      if(pg[pid+'_sdate']){
+        el('rd-solve-info').style.display='';
+        el('rd-solve-date').textContent=fmtDate(pg[pid+'_sdate']);
+        renderRevIntervals(tid,pid,pg[pid+'_sdate']);
+        renderRevHistory(tid,pid,pg[pid+'_sdate']);
+      }
+    }
+
+    // ══════════════════════════════════════
+    // NOTES (inline from dashboard)
+    // ══════════════════════════════════════
+    function openInlineNote(tid,pid,pname){
+      // open rev dash on notes tab
+      openRevDash(tid,pid);
+      setTimeout(()=>el('rd-notes').focus(),400);
+    }
+    function saveRevNote(){
+      if(!curRevKey)return;
+      const txt=el('rd-notes').value.trim();
+      if(txt)notes[curRevKey]=txt;else delete notes[curRevKey];
+      save();toast('Notes saved! 📝');
+    }
+    function deleteRevNote(){
+      if(!curRevKey)return;
+      delete notes[curRevKey];
+      el('rd-notes').value='';
+      save();toast('Notes deleted');
+    }
+
+    // ══════════════════════════════════════
+    // ADD TOPIC
+    // ══════════════════════════════════════
+    function saveTopic(){
+      const title=v('tm-title');if(!title)return toast('Title required','err');
+      const concepts=el('tm-concepts').value.split('\n').map(s=>s.trim()).filter(Boolean);
+      const ts=topics[curCourse]||[];
+      ts.push({id:'t'+Date.now(),num:ts.length+1,title,phase:el('tm-phase').value,lecUrl:v('tm-lec-url'),concepts,problems:[]});
+      topics[curCourse]=ts;save();closeModal('modal-topic');renderDashboard();toast('Topic added!');
+    }
+
+    // ══════════════════════════════════════
+    // ADD PROBLEM
+    // ══════════════════════════════════════
+    function openAddProblem(tid){
+      el('pm-tid').value=tid;
+      ['pm-name','pm-url'].forEach(id=>el(id).value='');
+      el('pm-lc').value='';el('pm-diff').value='Medium';
+      openModal('modal-prob');
+    }
+    function saveProblem(){
+      const tid=el('pm-tid').value,name=v('pm-name');
+      if(!name)return toast('Name required','err');
+      const lc=parseInt(el('pm-lc').value)||0;
+      const diff=el('pm-diff').value;
+      let url=v('pm-url');
+      if(!url&&lc)url=`https://leetcode.com/problems/${name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'')}/`;
+      const ts=topics[curCourse]||[];const t=ts.find(x=>x.id===tid);if(!t)return;
+      t.problems=t.problems||[];
+      t.problems.push({id:'p'+Date.now(),lc,name,diff,url});
+      save();closeModal('modal-prob');
+      // refresh whichever view is showing
+      if(el('page-probdash').classList.contains('active')){renderProbDash();}
+      else{renderDashboard();}
+      toast('Problem added!');
+    }
+
+    // ══════════════════════════════════════
+    // CALENDAR REVISION PAGE
+    // ══════════════════════════════════════
+    let calY=new Date().getFullYear(),calM=new Date().getMonth();
+    function changeMonth(d){calM+=d;if(calM>11){calM=0;calY++}if(calM<0){calM=11;calY--}renderRevision()}
+
+    function renderRevision(){
+      const today=todayStr();
+      const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+      el('cal-title').textContent=months[calM]+' '+calY;
+      const days=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+      el('cal-head').innerHTML=days.map(d=>`<div class="cal-day-lbl">${d}</div>`).join('');
+
+      const revDays=new Set();
+      const prefix=calY+'-'+String(calM+1).padStart(2,'0');
+      Object.entries(revs).forEach(([key,r])=>{
+        if(!r||!r.solvedDate)return;
+        REV_DAYS.forEach(d=>{
+          const due=addDays(r.solvedDate,d);
+          if(due.startsWith(prefix)&&!r.intervals?.[d])revDays.add(parseInt(due.slice(8,10)));
+        });
+      });
+
+      const first=new Date(calY,calM,1).getDay();
+      const total=new Date(calY,calM+1,0).getDate();
+      const now=new Date();
+      let html='';
+      for(let i=0;i<first;i++)html+=`<div class="cal-cell empty"></div>`;
+      for(let d=1;d<=total;d++){
+        const isToday=now.getFullYear()===calY&&now.getMonth()===calM&&now.getDate()===d;
+        const hasR=revDays.has(d);
+        html+=`<div class="cal-cell ${isToday?'today':''} ${hasR?'has-rev':''}">${d}</div>`;
+      }
+      el('cal-grid').innerHTML=html;
+
+      // Due list
+      const allTopics=Object.values(topics).flat();
+      const due=[],upcoming=[];
+      Object.entries(revs).forEach(([key,r])=>{
+        if(!r||!r.solvedDate)return;
+        const [tid,pid]=key.split('_');
+        const t=allTopics.find(x=>x.id===tid);const p=t?.problems?.find(x=>x.id===pid);if(!t||!p)return;
+        REV_DAYS.forEach(d=>{
+          if(r.intervals?.[d])return;
+          const due_=addDays(r.solvedDate,d);
+          const diff=daysBetween(today,due_);
+          const info={key,tid,pid,dueDate:due_,diff,topicTitle:t.title,probName:p.name,probUrl:p.url,day:d};
+          if(diff<=0)due.push(info);else if(diff<=7)upcoming.push(info);
+        });
+      });
+      due.sort((a,b)=>a.diff-b.diff);
+      upcoming.sort((a,b)=>a.diff-b.diff);
+
+      el('due-count').textContent=due.length+' items';
+      el('upcoming-count').textContent=upcoming.length+' items';
+
+      el('due-list').innerHTML=due.length?due.map(x=>`
+        <div class="rev-row" onclick="openRevDash('${x.tid}','${x.pid}')">
+          <div class="rev-row-info">
+            <div class="rev-row-title">${esc(x.probName)} <span style="font-size:.72rem;color:var(--muted)">(Day ${x.day})</span></div>
+            <div class="rev-row-meta">${esc(x.topicTitle)} · ${x.diff<0?Math.abs(x.diff)+' days overdue':'Due today'}</div>
+          </div>
+          <span class="rev-due-tag ${x.diff<0?'tag-overdue':'tag-today'}">${x.diff<0?'Overdue':'Today'}</span>
+          <button class="rev-done-btn" onclick="event.stopPropagation();quickDone('${x.key}',${x.day},this)">✓ Done</button>
+        </div>`).join(''):`<div class="empty-state"><div class="big">🎉</div>No revisions due!</div>`;
+
+      el('upcoming-list').innerHTML=upcoming.length?upcoming.map(x=>`
+        <div class="rev-row" onclick="openRevDash('${x.tid}','${x.pid}')">
+          <div class="rev-row-info">
+            <div class="rev-row-title">${esc(x.probName)} <span style="font-size:.72rem;color:var(--muted)">(Day ${x.day})</span></div>
+            <div class="rev-row-meta">${esc(x.topicTitle)}</div>
+          </div>
+          <span class="rev-due-tag tag-soon">In ${x.diff} day${x.diff===1?'':'s'}</span>
+        </div>`).join(''):`<div class="empty-state"><div class="big">✨</div>Nothing upcoming</div>`;
+    }
+
+    function quickDone(key,day,btn){
+      if(!revs[key])revs[key]={intervals:{}};
+      if(!revs[key].intervals)revs[key].intervals={};
+      revs[key].intervals[day]=true;
+      save();btn.closest('.rev-row').style.opacity='.4';
+      btn.textContent='✓';btn.disabled=true;
+      setTimeout(()=>renderRevision(),600);
+      toast('Day '+day+' revision done! 🎉');
+    }
+
+
+    // ══════════════════════════════════════
+    // PROBLEMS DASHBOARD
+    // ══════════════════════════════════════
+    let curPDTopicId = null;
+    let pdDiffFilter = 'all';
+
+    function openProbDash(tid){
+      curPDTopicId = tid;
+      pdDiffFilter = 'all';
+      document.querySelectorAll('.diff-chip').forEach((c,i)=>c.classList.toggle('active',i===0));
+      if(el('pd-search'))el('pd-search').value='';
+      renderProbDash();
+      goPage('probdash');
+    }
+
+    function renderProbDash(){
+      if(!curPDTopicId||!curCourse)return;
+      const ts=topics[curCourse]||[];
+      const t=ts.find(x=>x.id===curPDTopicId);
+      if(!t)return;
+      const pg=progress[t.id]||{};
+      const probs=t.problems||[];
+
+      // header
+      el('pd-num').textContent=t.num;
+      el('pd-title').textContent=t.title;
+      el('pd-phase').textContent=t.phase;
+      if(t.lecUrl){
+        el('pd-lec-link').href=t.lecUrl;el('pd-lec-link').style.display='';
+        el('pd-lec-add').style.display='none';
+      } else {
+        el('pd-lec-link').style.display='none';el('pd-lec-add').style.display='';
+      }
+
+      // stats
+      const solved=probs.filter(p=>pg[p.id+'_s']).length;
+      const easy=probs.filter(p=>p.diff==='Easy').length;
+      const med=probs.filter(p=>p.diff==='Medium').length;
+      const hard=probs.filter(p=>p.diff==='Hard').length;
+      const revDone=probs.reduce((a,p)=>{
+        const r=revs[t.id+'_'+p.id];
+        return a+(r?Object.values(r.intervals||{}).filter(Boolean).length:0);
+      },0);
+      el('pds-total').textContent=probs.length;
+      el('pds-solved').textContent=solved;
+      el('pds-easy').textContent=easy;
+      el('pds-med').textContent=med;
+      el('pds-hard').textContent=hard;
+      el('pds-rev').textContent=revDone;
+
+      // concepts
+      el('pd-concepts').innerHTML=(t.concepts||[]).map(c=>
+        `<div class="pd-concept-chip">${esc(c)}</div>`).join('');
+
+      pdRenderRows();
+    }
+
+    function pdFilter(){pdRenderRows()}
+    function pdSetDiff(d,btn){
+      pdDiffFilter=d;
+      document.querySelectorAll('.diff-chip').forEach(c=>c.classList.remove('active'));
+      btn.classList.add('active');
+      pdRenderRows();
+    }
+
+    function pdRenderRows(){
+      if(!curPDTopicId||!curCourse)return;
+      const ts=topics[curCourse]||[];
+      const t=ts.find(x=>x.id===curPDTopicId);
+      if(!t)return;
+      const pg=progress[t.id]||{};
+      const srch=(el('pd-search')?.value||'').toLowerCase();
+      let probs=t.problems||[];
+
+      // filter
+      if(pdDiffFilter==='unsolved') probs=probs.filter(p=>!pg[p.id+'_s']);
+      else if(pdDiffFilter!=='all') probs=probs.filter(p=>p.diff===pdDiffFilter);
+      if(srch) probs=probs.filter(p=>p.name.toLowerCase().includes(srch)||String(p.lc).includes(srch));
+
+      el('pd-count-label').textContent=probs.length+' problem'+(probs.length!==1?'s':'');
+
+      if(!probs.length){
+        el('pd-prob-rows').innerHTML=`<div class="pd-empty"><div class="big">🔍</div>${srch||pdDiffFilter!=='all'?'No problems match your filter':'No problems yet — add your first!'}</div>`;
+        return;
+      }
+
+      el('pd-prob-rows').innerHTML=probs.map((p,i)=>{
+        const isSolved=!!pg[p.id+'_s'];
+        const revKey=t.id+'_'+p.id;
+        const hasNote=!!notes[revKey];
+        const hasRev=!!revs[revKey];
+        const revScheduled=hasRev?revs[revKey].intervals||{}:{};
+        const doneCount=Object.values(revScheduled).filter(Boolean).length;
+        const diffCls=p.diff==='Easy'?'diff-easy':p.diff==='Hard'?'diff-hard':'diff-med';
+        return `<div class="pd-prob-row ${isSolved?'solved':''}" id="pdr-${revKey}">
+          <span class="pd-row-num">${i+1}</span>
+          <span class="pd-lc">LC ${p.lc||'—'}</span>
+          <span class="pd-name" onclick="openLeetCode('${esc(p.url||'')}','${t.id}','${p.id}')">${esc(p.name)}</span>
+          <span class="pd-diff ${diffCls}">${p.diff}</span>
+          <button class="pd-solved-check ${isSolved?'done':''}" onclick="pdToggleSolve('${t.id}','${p.id}',this)" title="${isSolved?'Solved — click to unmark':'Mark as solved'}">
+            ${isSolved?'✓':'○'}
+          </button>
+          <div class="pd-row-actions">
+            <button class="pd-icon-btn ${hasNote?'note-active':''}" onclick="openRevDash('${t.id}','${p.id}')" title="Notes & Revision">📝</button>
+            <button class="pd-icon-btn ${hasRev?'rev-active':''}" onclick="openRevDash('${t.id}','${p.id}')" title="Revision: ${doneCount}/${REV_DAYS.length} done" style="font-size:.7rem;font-family:'Space Mono',monospace;font-weight:700">
+              ${hasRev?(doneCount+'/'+REV_DAYS.length):'🔄'}
+            </button>
+            <button class="pd-icon-btn lc-open" onclick="if('${esc(p.url||'')}')window.open('${esc(p.url||'')}','_blank')" title="Open LeetCode">↗</button>
+            <button class="pd-icon-btn" onclick="pdDeleteProb('${t.id}','${p.id}')" title="Delete problem" style="color:var(--danger);opacity:.5">🗑</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function pdToggleSolve(tid,pid,btn){
+      if(!progress[tid])progress[tid]={};
+      const key=pid+'_s';
+      const was=!!progress[tid][key];
+      if(!was){
+        progress[tid][key]=true;
+        progress[tid][pid+'_sdate']=todayStr();
+        // auto schedule revision
+        const rKey=tid+'_'+pid;
+        if(!revs[rKey])revs[rKey]={solvedDate:todayStr(),intervals:{}};
+        btn.className='pd-solved-check done';btn.textContent='✓';
+        btn.closest('.pd-prob-row').classList.add('solved');
+        toast('✅ Solved + Revision scheduled!');
+      } else {
+        progress[tid][key]=false;
+        btn.className='pd-solved-check';btn.textContent='○';
+        btn.closest('.pd-prob-row').classList.remove('solved');
+        toast('Unmarked');
+      }
+      save();renderProbDash();updateStats();
+    }
+
+    function pdDeleteProb(tid,pid){
+      if(!confirm('Delete this problem?'))return;
+      const ts=topics[curCourse]||[];
+      const t=ts.find(x=>x.id===tid);if(!t)return;
+      t.problems=(t.problems||[]).filter(p=>p.id!==pid);
+      delete revs[tid+'_'+pid];delete notes[tid+'_'+pid];
+      if(progress[tid])delete progress[tid][pid+'_s'];
+      save();renderProbDash();toast('Problem deleted');
+    }
+
+    function openAddProblemPD(){
+      el('pm-tid').value=curPDTopicId;
+      ['pm-name','pm-url'].forEach(id=>{if(el(id))el(id).value='';});
+      if(el('pm-lc'))el('pm-lc').value='';
+      if(el('pm-diff'))el('pm-diff').value='Medium';
+      openModal('modal-prob');
+    }
+
+    function pdAddLec(){
+      const url=prompt('Enter lecture URL:');if(!url)return;
+      const ts=topics[curCourse]||[];
+      const t=ts.find(x=>x.id===curPDTopicId);
+      if(t){t.lecUrl=url;save();renderProbDash();}
+    }
+
+    // ══════════════════════════════════════
+    // HELPERS
+    // ══════════════════════════════════════
+    function todayStr(){return new Date().toISOString().slice(0,10)}
+    function addDays(dateStr,n){const d=new Date(dateStr);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+    function daysBetween(a,b){return Math.floor((new Date(b)-new Date(a))/(86400000))}
+    function fmtDate(s){if(!s||s==='—')return '—';const d=new Date(s);return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+    function openModal(id){el(id).classList.add('open')}
+    function closeModal(id){el(id).classList.remove('open')}
+    function el(id){return document.getElementById(id)}
+    function v(id){return el(id)?.value?.trim()||''}
+    function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+    function setMsg(e,t,c){e.className='auth-msg '+c;e.textContent=t}
+    function toast(msg,type='ok'){
+      const t=el('toast');t.textContent=msg;t.className='toast show '+type;
+      clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',2800);
+    }
+    document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+    // ══════════════════════════════════════
+    // INIT
+    // ══════════════════════════════════════
+    seedDefaults();
+    updateNav();
+    if(curUser){renderCourses();goPage('courses')}
+    else goPage('auth');
+</script>
+</body>
+</html>
